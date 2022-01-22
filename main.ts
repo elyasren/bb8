@@ -1,22 +1,44 @@
-let vitesse = 45
+function tourner_a_droite () {
+    k_Bit.Motor(MotorObs.LeftSide, MotorDir.Forward, 13)
+    k_Bit.Motor(MotorObs.RightSide, MotorDir.Forward, vitesse)
+}
+function tourner_a_gauche () {
+    k_Bit.Motor(MotorObs.RightSide, MotorDir.Forward, 13)
+    k_Bit.Motor(MotorObs.LeftSide, MotorDir.Forward, vitesse)
+}
+let vitesse = 0
+music.setBuiltInSpeakerEnabled(true)
+vitesse = 45
+let obstacleDevant = 0
 k_Bit.run(DIR.RunForward, vitesse)
 basic.showIcon(IconNames.Yes)
 basic.forever(function () {
     if (k_Bit.ultra() < 100) {
-        if (randint(0, 1) == 0) {
-            k_Bit.Motor(MotorObs.LeftSide, MotorDir.Forward, 10)
+        obstacleDevant = 1
+        if (k_Bit.obstacle(MotorObs.LeftSide) == 0) {
+            tourner_a_droite()
+        } else if (k_Bit.obstacle(MotorObs.RightSide) == 0) {
+            tourner_a_gauche()
         } else {
-            k_Bit.Motor(MotorObs.RightSide, MotorDir.Forward, 10)
+            soundExpression.hello.play()
+            if (randint(0, 1) == 0) {
+                tourner_a_droite()
+            } else {
+                tourner_a_gauche()
+            }
+            basic.showIcon(IconNames.No)
         }
-        basic.showIcon(IconNames.No)
+    } else {
+        obstacleDevant = 0
+        basic.showIcon(IconNames.Yes)
     }
 })
 basic.forever(function () {
-    if (k_Bit.obstacle(MotorObs.LeftSide) == 1 && k_Bit.obstacle(MotorObs.RightSide) == 1) {
+    if (k_Bit.obstacle(MotorObs.LeftSide) == 1 && k_Bit.obstacle(MotorObs.RightSide) == 1 && !(obstacleDevant)) {
         k_Bit.run(DIR.RunForward, vitesse)
     } else if (k_Bit.obstacle(MotorObs.LeftSide) == 0 && k_Bit.obstacle(MotorObs.RightSide) == 1) {
-        k_Bit.Motor(MotorObs.RightSide, MotorDir.Forward, 13)
+        tourner_a_gauche()
     } else if (k_Bit.obstacle(MotorObs.LeftSide) == 1 && k_Bit.obstacle(MotorObs.RightSide) == 0) {
-        k_Bit.Motor(MotorObs.LeftSide, MotorDir.Forward, 13)
+        tourner_a_droite()
     }
 })
